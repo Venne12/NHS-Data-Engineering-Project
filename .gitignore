@@ -1,0 +1,22 @@
+# Python / notebooks
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# Databricks files
+*.dbc
+*.dbml
+*.log
+
+# VS Code settings
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary data
+*.tmp
+*.temp
