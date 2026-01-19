@@ -1,0 +1,194 @@
+{
+    "name": "ingest_nhs_ae_raw",
+    "properties": {
+        "activities": [
+            {
+                "name": "forEach_month",
+                "type": "ForEach",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@pipeline().parameters.MonthsArray",
+                        "type": "Expression"
+                    },
+                    "isSequential": true,
+                    "activities": [
+                        {
+                            "name": "IfCondition_Month",
+                            "type": "IfCondition",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "expression": {
+                                    "value": "@or(equals(item(), 'October'), equals(item(), 'November'))",
+                                    "type": "Expression"
+                                },
+                                "ifFalseActivities": [
+                                    {
+                                        "name": "copy_nhs_ae_raw_false",
+                                        "type": "Copy",
+                                        "dependsOn": [],
+                                        "policy": {
+                                            "retry": 0,
+                                            "retryIntervalInSeconds": 30,
+                                            "secureOutput": false,
+                                            "secureInput": false
+                                        },
+                                        "userProperties": [],
+                                        "typeProperties": {
+                                            "source": {
+                                                "type": "DelimitedTextSource",
+                                                "storeSettings": {
+                                                    "type": "HttpReadSettings",
+                                                    "requestMethod": "GET"
+                                                },
+                                                "formatSettings": {
+                                                    "type": "DelimitedTextReadSettings"
+                                                },
+                                                "dataset": {
+                                                    "referenceName": "src_nhs_ae_http_csv",
+                                                    "type": "DatasetReference",
+                                                    "parameters": {
+                                                        "RelativePath": "@item()"
+                                                    }
+                                                }
+                                            },
+                                            "sink": {
+                                                "type": "DelimitedTextSink",
+                                                "storeSettings": {
+                                                    "type": "AzureBlobStorageWriteSettings",
+                                                    "copyBehavior": "PreserveHierarchy"
+                                                },
+                                                "formatSettings": {
+                                                    "type": "DelimitedTextWriteSettings",
+                                                    "quoteAllText": true,
+                                                    "fileExtension": ".csv"
+                                                },
+                                                "dataset": {
+                                                    "referenceName": "sink_nhs_raw",
+                                                    "type": "DatasetReference"
+                                                }
+                                            },
+                                            "enableStaging": false,
+                                            "translator": {
+                                                "type": "TabularTranslator",
+                                                "typeConversion": true,
+                                                "typeConversionSettings": {
+                                                    "allowDataTruncation": true,
+                                                    "treatBooleanAsNumber": false
+                                                }
+                                            }
+                                        },
+                                        "inputs": [
+                                            {
+                                                "referenceName": "src_nhs_ae_http_csv",
+                                                "type": "DatasetReference",
+                                                "parameters": {
+                                                    "RelativePath": {
+                                                        "value": "@concat(\n  '/statistics/wp-content/uploads/sites/2/2025/11/',\n  item(),\n  '-2025-CSV-revised.csv'\n)",
+                                                        "type": "Expression"
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "outputs": [
+                                            {
+                                                "referenceName": "sink_nhs_raw",
+                                                "type": "DatasetReference"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "ifTrueActivities": [
+                                    {
+                                        "name": "copy_nhs_ae_true",
+                                        "type": "Copy",
+                                        "dependsOn": [],
+                                        "policy": {
+                                            "timeout": "0.12:00:00",
+                                            "retry": 0,
+                                            "retryIntervalInSeconds": 30,
+                                            "secureOutput": false,
+                                            "secureInput": false
+                                        },
+                                        "userProperties": [],
+                                        "typeProperties": {
+                                            "source": {
+                                                "type": "DelimitedTextSource",
+                                                "storeSettings": {
+                                                    "type": "HttpReadSettings",
+                                                    "requestMethod": "GET"
+                                                },
+                                                "formatSettings": {
+                                                    "type": "DelimitedTextReadSettings"
+                                                }
+                                            },
+                                            "sink": {
+                                                "type": "DelimitedTextSink",
+                                                "storeSettings": {
+                                                    "type": "AzureBlobStorageWriteSettings",
+                                                    "copyBehavior": "PreserveHierarchy"
+                                                },
+                                                "formatSettings": {
+                                                    "type": "DelimitedTextWriteSettings",
+                                                    "quoteAllText": true,
+                                                    "fileExtension": ".csv"
+                                                }
+                                            },
+                                            "enableStaging": false,
+                                            "translator": {
+                                                "type": "TabularTranslator",
+                                                "typeConversion": true,
+                                                "typeConversionSettings": {
+                                                    "allowDataTruncation": true,
+                                                    "treatBooleanAsNumber": false
+                                                }
+                                            }
+                                        },
+                                        "inputs": [
+                                            {
+                                                "referenceName": "src_nhs_ae_http_csv",
+                                                "type": "DatasetReference",
+                                                "parameters": {
+                                                    "RelativePath": {
+                                                        "value": "@if(\n  equals(item(), 'October'),\n  '/statistics/wp-content/uploads/sites/2/2025/11/October-2025-CSV-hg6dl.csv',\n  '/statistics/wp-content/uploads/sites/2/2025/12/November-2025-CSV-G9pr3.csv'\n)",
+                                                        "type": "Expression"
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "outputs": [
+                                            {
+                                                "referenceName": "sink_nhs_raw",
+                                                "type": "DatasetReference"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {
+            "MonthsArray": {
+                "type": "Array",
+                "defaultValue": [
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November"
+                ]
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2025-12-23T02:41:50Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
