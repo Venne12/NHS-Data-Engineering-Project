@@ -26,19 +26,6 @@ The project is divided into four main phases, from raw data ingestion to gold-le
 
 ---
 
-## Folder Structure
-architecture/
-adls-gen2/
-azure-data-factory/
-azure-key-vault/
-databricks-access-connector/
-access-control/
-databricks-workspace/
-dashboard/
-
-
----
-
 ## Dataset Details
 
 The project ingests **monthly NHS A&E CSV files** from the public NHS website and processes them through the Lakehouse pipeline.  
